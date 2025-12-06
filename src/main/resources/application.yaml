@@ -1,0 +1,39 @@
+spring:
+  application:
+    name: user-service
+
+  datasource:
+    url: jdbc:postgresql://localhost:5432/userdb
+    username: postgres
+    password: password
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        default_schema: public
+        format_sql: true
+    show-sql: true
+
+  sql:
+    init:
+      mode: always
+      schema-locations: classpath:schema.sql
+
+  jackson:
+    date-format: yyyy-MM-dd HH:mm:ss
+    time-zone: UTC
+
+server:
+  port: 8080
+  servlet:
+    context-path: /user-service
+
+logging:
+  level:
+    ru.astondevs: DEBUG
+    org.springframework.web: DEBUG
+    org.hibernate.SQL: DEBUG
+    org.hibernate.type.descriptor.sql.BasicBinder: TRACE
