@@ -57,7 +57,8 @@ public class UserService {
         User user = findUserById(id);
 
         if (updateUserRequestDTO.email() != null &&
-                !updateUserRequestDTO.email().equals(user.getEmail()) && userRepository.existsByEmailAndIdNot(updateUserRequestDTO.email(), id)) {
+                !updateUserRequestDTO.email().equals(user.getEmail()) &&
+                userRepository.existsByEmailAndIdNot(updateUserRequestDTO.email(), id)) {
                 throw new UserAlreadyExistsException(
                         String.format("User with email %s already exists",
                                 updateUserRequestDTO.email())
