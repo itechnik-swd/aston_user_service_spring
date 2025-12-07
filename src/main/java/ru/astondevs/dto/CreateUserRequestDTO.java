@@ -4,21 +4,20 @@ import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.PositiveOrZero;
-import lombok.Getter;
-import lombok.Setter;
+import jakarta.validation.constraints.Size;
 
-@Setter
-@Getter
-public class CreateUserRequestDTO {
+public record CreateUserRequestDTO(
+        @NotBlank(message = "Name must not be blank")
+        @Size(max = 25, message = "Name must be less than 25 characters")
+        String name,
 
-    @NotBlank(message = "Name is required")
-    private String name;
+        @Email(message = "Email should be valid")
+        @NotBlank(message = "Email must not be blank")
+        @Size(max = 50, message = "Email must be less than 50 characters")
+        String email,
 
-    @NotBlank(message = "Email is required")
-    @Email(message = "Email should be valid")
-    private String email;
-
-    @NotNull(message = "Age is required")
-    @PositiveOrZero(message = "Age must be positive or zero")
-    private int age;
+        @PositiveOrZero(message = "Age must be positive or zero")
+        @NotNull(message = "Age must not be null")
+        int age
+) {
 }

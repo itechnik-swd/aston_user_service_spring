@@ -1,21 +1,19 @@
 package ru.astondevs.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import lombok.Data;
 
 import java.time.LocalDateTime;
 
-@Data
-public class UserResponseDTO {
+public record UserResponseDTO (
+        long userId,
+        String name,
+        String email,
+        int age,
 
-    private long userId;
-    private String name;
-    private String email;
-    private int age;
+        @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+        LocalDateTime createdAt,
 
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-    private LocalDateTime createdAt;
-
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-    private LocalDateTime updatedAt;
+        @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+        LocalDateTime updatedAt
+) {
 }

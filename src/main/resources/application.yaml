@@ -16,6 +16,7 @@ spring:
         default_schema: public
         format_sql: true
     show-sql: true
+    open-in-view: false
 
   sql:
     init:

@@ -17,9 +17,12 @@ import ru.astondevs.entity.User;
 public interface UserMapper {
 
     @Mapping(source = "id", target = "userId")
-    UserResponseDTO userToUserResponseDTO(User user);
+    UserResponseDTO toUserResponseDTO(User user);
 
-    User createUserRequestDTOToUser(CreateUserRequestDTO createUserRequestDTO);
+    @Mapping(target = "id", ignore = true)
+    @Mapping(target = "createdAt", ignore = true)
+    @Mapping(target = "updatedAt", ignore = true)
+    User toUser(CreateUserRequestDTO createUserRequestDTO);
 
     void updateUser(UpdateUserRequestDTO updateUserRequestDTO, @MappingTarget User user);
 }

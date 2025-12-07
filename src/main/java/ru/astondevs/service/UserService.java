@@ -25,27 +25,28 @@ public class UserService {
 
     @Transactional
     public UserResponseDTO createUser(CreateUserRequestDTO createUserRequestDTO) {
-        if (userRepository.existsByEmail(createUserRequestDTO.getEmail())) {
+        if (userRepository.existsByEmail(createUserRequestDTO.email())) {
             throw new UserAlreadyExistsException(
-                    String.format("User with email %s already exists", createUserRequestDTO.getEmail())
+                    String.format("User with email %s already exists",
+                            createUserRequestDTO.email())
             );
         }
 
-        User user = userMapper.createUserRequestDTOToUser(createUserRequestDTO);
+        User user = userMapper.toUser(createUserRequestDTO);
         User savedUser = userRepository.save(user);
-        return userMapper.userToUserResponseDTO(savedUser);
+        return userMapper.toUserResponseDTO(savedUser);
     }
 
     public UserResponseDTO getUserById(Long id) {
         User user = findUserById(id);
-        return userMapper.userToUserResponseDTO(user);
+        return userMapper.toUserResponseDTO(user);
     }
 
     public List<UserResponseDTO> getAllUsers() {
         List<UserResponseDTO> users = new ArrayList<>();
 
         for (User user : userRepository.findAll()) {
-            users.add(userMapper.userToUserResponseDTO(user));
+            users.add(userMapper.toUserResponseDTO(user));
         }
 
         return users;
@@ -55,19 +56,18 @@ public class UserService {
     public UserResponseDTO updateUser(Long id, UpdateUserRequestDTO updateUserRequestDTO) {
         User user = findUserById(id);
 
-        if (updateUserRequestDTO.getEmail() != null &&
-                !updateUserRequestDTO.getEmail().equals(user.getEmail())) {
-
-            if (userRepository.existsByEmailAndIdNot(updateUserRequestDTO.getEmail(), id)) {
+        if (updateUserRequestDTO.email() != null &&
+                !updateUserRequestDTO.email().equals(user.getEmail()) && userRepository.existsByEmailAndIdNot(updateUserRequestDTO.email(), id)) {
                 throw new UserAlreadyExistsException(
-                        String.format("User with email %s already exists", updateUserRequestDTO.getEmail())
+                        String.format("User with email %s already exists",
+                                updateUserRequestDTO.email())
                 );
             }
-        }
+
 
         userMapper.updateUser(updateUserRequestDTO, user);
         User updatedUser = userRepository.save(user);
-        return userMapper.userToUserResponseDTO(updatedUser);
+        return userMapper.toUserResponseDTO(updatedUser);
     }
 
     @Transactional
