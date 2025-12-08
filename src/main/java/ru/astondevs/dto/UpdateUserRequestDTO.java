@@ -10,6 +10,6 @@ public record UpdateUserRequestDTO (
         String email,
 
         @PositiveOrZero(message = "Age must be positive or zero")
-        int age
+        Integer age
 ) {
 }

@@ -103,9 +103,11 @@ class UserServiceUnitTest {
     void getUserById_ShouldThrowException_WhenUserNotExists() {
         // Given
         long userId = 999L;
+
+        //  When
         when(userRepository.findById(userId)).thenReturn(Optional.empty());
 
-        // When & Then
+        // Then
         assertThatThrownBy(() -> userService.getUserById(userId))
                 .isInstanceOf(UserNotFoundException.class)
                 .hasMessage("User with id %d not found", userId);
@@ -183,9 +185,9 @@ class UserServiceUnitTest {
     void deleteUser_ShouldDeleteUser_WhenUserExists() {
         // Given
         long userId = 1L;
-        when(userRepository.existsById(userId)).thenReturn(true);
 
         // When
+        when(userRepository.existsById(userId)).thenReturn(true);
         userService.deleteUser(userId);
 
         // Then
@@ -198,9 +200,10 @@ class UserServiceUnitTest {
         // Given
         long userId = 999L;
 
-        // When & Then
+        // When
         when(userRepository.existsById(userId)).thenReturn(false);
 
+        // Then
         assertThatThrownBy(() -> userService.deleteUser(userId))
                 .isInstanceOf(UserNotFoundException.class)
                 .hasMessage("User with id %d not found", userId);
