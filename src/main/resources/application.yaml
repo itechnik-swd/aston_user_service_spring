@@ -1,6 +1,6 @@
 spring:
   application:
-    name: user-service
+    name: aston_user_service_spring
 
   datasource:
     url: jdbc:postgresql://localhost:5432/userdb
@@ -26,6 +26,20 @@ spring:
   jackson:
     date-format: yyyy-MM-dd HH:mm:ss
     time-zone: UTC
+
+  kafka:
+    bootstrap-servers: localhost:9092
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+      properties:
+        spring.json.type.mapping: userEvent:ru.astondevs.kafka.event.UserEvent
+
+# Топики для событий
+app:
+  kafka:
+    topics:
+      user-events: user-events-topic
 
 server:
   port: 8080

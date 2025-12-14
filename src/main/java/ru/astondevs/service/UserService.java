@@ -9,11 +9,17 @@ import ru.astondevs.dto.UserResponseDTO;
 import ru.astondevs.entity.User;
 import ru.astondevs.exception.UserAlreadyExistsException;
 import ru.astondevs.exception.UserNotFoundException;
+import ru.astondevs.kafka.UserEventProducer;
+import ru.astondevs.kafka.event.UserEvent;
 import ru.astondevs.mapper.UserMapper;
 import ru.astondevs.repository.UserRepository;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+
+import static ru.astondevs.enums.EventType.USER_CREATED;
+import static ru.astondevs.enums.EventType.USER_DELETED;
 
 @Service
 @RequiredArgsConstructor
@@ -22,6 +28,7 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final UserMapper userMapper;
+    private final UserEventProducer userEventProducer;
 
     @Transactional
     public UserResponseDTO createUser(CreateUserRequestDTO createUserRequestDTO) {
@@ -34,6 +41,9 @@ public class UserService {
 
         User user = userMapper.toUser(createUserRequestDTO);
         User savedUser = userRepository.save(user);
+
+        sendUserCreatedEvent(savedUser);
+
         return userMapper.toUserResponseDTO(savedUser);
     }
 
@@ -65,7 +75,6 @@ public class UserService {
                 );
             }
 
-
         userMapper.updateUser(updateUserRequestDTO, user);
         User updatedUser = userRepository.save(user);
         return userMapper.toUserResponseDTO(updatedUser);
@@ -78,6 +87,11 @@ public class UserService {
                     String.format("User with id %d not found", id)
             );
         }
+
+        User user = findUserById(id);
+
+        sendUserDeletedEvent(user);
+
         userRepository.deleteById(id);
     }
 
@@ -86,5 +100,27 @@ public class UserService {
                 .orElseThrow(() -> new UserNotFoundException(
                         String.format("User with id %d not found", id)
                 ));
+    }
+
+    private void sendUserCreatedEvent(User user) {
+        UserEvent event = new UserEvent(
+                user.getId(),
+                user.getEmail(),
+                user.getName(),
+                USER_CREATED,
+                LocalDateTime.now()
+        );
+        userEventProducer.sendUserEvent(event);
+    }
+
+    private void sendUserDeletedEvent(User user) {
+        UserEvent event = new UserEvent(
+                user.getId(),
+                user.getEmail(),
+                user.getName(),
+                USER_DELETED,
+                LocalDateTime.now()
+        );
+        userEventProducer.sendUserEvent(event);
     }
 }
