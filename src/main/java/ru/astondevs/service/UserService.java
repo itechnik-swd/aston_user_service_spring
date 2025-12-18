@@ -14,7 +14,6 @@ import ru.astondevs.kafka.event.UserEvent;
 import ru.astondevs.mapper.UserMapper;
 import ru.astondevs.repository.UserRepository;
 
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -104,22 +103,16 @@ public class UserService {
 
     private void sendUserCreatedEvent(User user) {
         UserEvent event = new UserEvent(
-                user.getId(),
-                user.getEmail(),
-                user.getName(),
                 USER_CREATED,
-                LocalDateTime.now()
+                user.getEmail()
         );
         userEventProducer.sendUserEvent(event);
     }
 
     private void sendUserDeletedEvent(User user) {
         UserEvent event = new UserEvent(
-                user.getId(),
-                user.getEmail(),
-                user.getName(),
                 USER_DELETED,
-                LocalDateTime.now()
+                user.getEmail()
         );
         userEventProducer.sendUserEvent(event);
     }
