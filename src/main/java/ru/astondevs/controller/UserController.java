@@ -2,6 +2,9 @@ package ru.astondevs.controller;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.hateoas.EntityModel;
+import org.springframework.hateoas.Link;
+import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -20,37 +23,64 @@ public class UserController {
     private final UserService userService;
 
     @PostMapping
-    public ResponseEntity<UserResponseDTO> createUser(
+    public ResponseEntity<EntityModel<UserResponseDTO>> createUser(
             @Valid @RequestBody CreateUserRequestDTO createUserRequestDTO) {
 
         UserResponseDTO createdUser = userService.createUser(createUserRequestDTO);
-        return ResponseEntity.status(HttpStatus.CREATED).body(createdUser);
+        EntityModel<UserResponseDTO> model = EntityModel.of(createdUser);
+        Link selfLink = WebMvcLinkBuilder.linkTo(UserController.class)
+                .slash(createdUser.userId())
+                .withSelfRel();
+        model.add(selfLink);
+        return ResponseEntity.status(HttpStatus.CREATED).body(model);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<UserResponseDTO> getUserById(@PathVariable Long id) {
+    public ResponseEntity<EntityModel<UserResponseDTO>> getUserById(@PathVariable Long id) {
         UserResponseDTO user = userService.getUserById(id);
-        return ResponseEntity.ok(user);
+        EntityModel<UserResponseDTO> model = EntityModel.of(user);
+        Link selfLink = WebMvcLinkBuilder.linkTo(UserController.class)
+                .slash(id)
+                .withSelfRel();
+        model.add(selfLink);
+        return ResponseEntity.ok(model);
     }
 
     @GetMapping
-    public ResponseEntity<List<UserResponseDTO>> getAllUsers() {
+    public ResponseEntity<List<EntityModel<UserResponseDTO>>> getAllUsers() {
         List<UserResponseDTO> users = userService.getAllUsers();
-        return ResponseEntity.ok(users);
+        List<EntityModel<UserResponseDTO>> models = users.stream()
+                .map(this::toEntityModel)
+                .toList();
+        return ResponseEntity.ok(models);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<UserResponseDTO> updateUser(
+    public ResponseEntity<EntityModel<UserResponseDTO>> updateUser(
             @PathVariable Long id,
             @Valid @RequestBody UpdateUserRequestDTO updateUserRequestDTO) {
 
         UserResponseDTO updatedUser = userService.updateUser(id, updateUserRequestDTO);
-        return ResponseEntity.ok(updatedUser);
+        EntityModel<UserResponseDTO> model = EntityModel.of(updatedUser);
+        Link selfLink = WebMvcLinkBuilder.linkTo(UserController.class)
+                .slash(id)
+                .withSelfRel();
+        model.add(selfLink);
+        return ResponseEntity.ok(model);
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteUser(@PathVariable Long id) {
         userService.deleteUser(id);
         return ResponseEntity.noContent().build();
+    }
+
+    private EntityModel<UserResponseDTO> toEntityModel(UserResponseDTO user) {
+        EntityModel<UserResponseDTO> model = EntityModel.of(user);
+        Link link = WebMvcLinkBuilder.linkTo(UserController.class)
+                .slash(user.userId())
+                .withSelfRel();
+        model.add(link);
+        return model;
     }
 }
